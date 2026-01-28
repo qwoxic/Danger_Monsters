@@ -1,25 +1,35 @@
 import arcade
-from database import save_score
+from database import save_score, get_high_scores
 
 class MenuView(arcade.View):
     def on_draw(self):
         self.clear()
-        arcade.set_background_color((20, 20, 30))
+        arcade.set_background_color((10, 10, 20))
         arcade.draw_text("DANGER MONSTERS", 512, 600, 
-                         arcade.color.WHITE, 48, anchor_x="center")
+                         arcade.color.CYAN, 48, anchor_x="center")
         arcade.draw_text("ЛКМ или ENTER - начать", 512, 450, 
                          arcade.color.LIGHT_GRAY, 24, anchor_x="center")
-        arcade.draw_text("WASD - движение", 512, 400, 
+        arcade.draw_text("ESC в игре - выйти в меню", 512, 400, 
                          arcade.color.LIGHT_GRAY, 20, anchor_x="center")
-        arcade.draw_text("ЛКМ/ПРОБЕЛ - стрельба", 512, 370, 
-                         arcade.color.LIGHT_GRAY, 20, anchor_x="center")
-        arcade.draw_text("ESC - выйти в меню", 512, 340, 
+        arcade.draw_text("Таблица результатов:", 512, 300, 
+                         arcade.color.YELLOW, 22, anchor_x="center")
+        
+        scores = get_high_scores(5)
+        y_pos = 250
+        for i, (name, score, date) in enumerate(scores):
+            arcade.draw_text(f"{i+1}. {name}: {score} очков ({date[:10]})", 
+                           512, y_pos, arcade.color.LIGHT_GRAY, 18, anchor_x="center")
+            y_pos -= 30
+        
+        arcade.draw_text("Нажмите Q для выхода", 512, 100, 
                          arcade.color.LIGHT_GRAY, 20, anchor_x="center")
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ENTER:
             from game import GameView
             self.window.show_view(GameView())
+        elif key == arcade.key.Q:
+            self.window.close()
 
     def on_mouse_press(self, x, y, button, modifiers):
         from game import GameView
@@ -34,12 +44,12 @@ class GameOverView(arcade.View):
     
     def on_draw(self):
         self.clear()
-        arcade.set_background_color((20, 20, 30))
+        arcade.set_background_color((15, 15, 25))
         
         if self.won:
             title = "ПОБЕДА!"
             color = arcade.color.GREEN
-            message = "Вы победили Колдуна!"
+            message = "Вы победили Босса!"
         else:
             title = "ПОРАЖЕНИЕ"
             color = arcade.color.RED
@@ -51,11 +61,11 @@ class GameOverView(arcade.View):
                          arcade.color.YELLOW, 36, anchor_x="center")
         arcade.draw_text("Нажмите ENTER для возврата в меню", 512, 250, 
                          arcade.color.LIGHT_GRAY, 24, anchor_x="center")
-        arcade.draw_text("Нажмите ESC для выхода", 512, 200, 
+        arcade.draw_text("Нажмите Q для выхода", 512, 200, 
                          arcade.color.LIGHT_GRAY, 20, anchor_x="center")
     
     def on_key_press(self, key, modifiers):
         if key == arcade.key.ENTER:
             self.window.show_view(MenuView())
-        elif key == arcade.key.ESCAPE:
+        elif key == arcade.key.Q:
             self.window.close()
