@@ -3,6 +3,7 @@ import random
 import math
 
 class Boss(arcade.Sprite):
+    """Класс босса с тремя фазами и разными атаками"""
     def __init__(self, x, y):
         super().__init__(":resources:images/space_shooter/playerShip2_orange.png", scale=2.0)
         self.center_x = x
@@ -17,9 +18,11 @@ class Boss(arcade.Sprite):
         self.color = arcade.color.RED
         
     def update(self, delta_time, player, bullet_list, enemy_list, game_view):
+        """Обновление состояния босса"""
         self.attack_timer += delta_time
         self.spawn_timer += delta_time
         
+        # Определение текущей фазы в зависимости от здоровья
         if self.health < self.max_health * 0.3:
             self.phase = 3
             self.speed = 150
@@ -35,6 +38,7 @@ class Boss(arcade.Sprite):
         
         self.angle += delta_time * 20
         
+        # Движение к игроку
         dx = player.center_x - self.center_x
         dy = player.center_y - self.center_y
         dist = max(math.sqrt(dx*dx + dy*dy), 1)
@@ -44,21 +48,26 @@ class Boss(arcade.Sprite):
             self.center_x += (dx / dist * self.speed * move_factor) * delta_time
             self.center_y += (dy / dist * self.speed * move_factor) * delta_time
         
+        # Ограничение движения по экрану
         self.center_x = max(60, min(964, self.center_x))
         self.center_y = max(100, min(668, self.center_y))
         
+        # Атака каждые 1.5 секунды
         if self.attack_timer > 1.5:
             self.attack(player, bullet_list, game_view)
             self.attack_timer = 0
             
+        # Спавн миньонов на 2 и 3 фазе
         if self.phase >= 2 and self.spawn_timer > 4:
             self.spawn_minions(enemy_list)
             self.spawn_timer = 0
     
     def attack(self, player, bullet_list, game_view):
+        """Различные типы атак для каждой фазы"""
         if game_view.shoot_sound:
             arcade.play_sound(game_view.shoot_sound, volume=0.3)
             
+        # Фаза 1: круговой выстрел
         if self.phase == 1:
             for angle in range(0, 360, 45):
                 bullet = arcade.SpriteCircle(10, arcade.color.ORANGE)
@@ -69,6 +78,7 @@ class Boss(arcade.Sprite):
                 bullet.change_y = math.sin(rad) * 200
                 bullet_list.append(bullet)
         
+        # Фаза 2: веерный выстрел по игроку
         elif self.phase == 2:
             for i in range(6):
                 bullet = arcade.SpriteCircle(8, arcade.color.RED)
@@ -82,7 +92,9 @@ class Boss(arcade.Sprite):
                 bullet.change_y = (dy / dist + spread) * 250
                 bullet_list.append(bullet)
         
+        # Фаза 3: хаотичный выстрел + вращающиеся пули
         else:
+            # Случайные пули
             for i in range(10):
                 bullet = arcade.SpriteCircle(6, arcade.color.CYAN)
                 bullet.center_x = self.center_x
@@ -93,6 +105,7 @@ class Boss(arcade.Sprite):
                 bullet.change_y = math.sin(angle) * speed
                 bullet_list.append(bullet)
             
+            # Вращающиеся пули по кругу
             self.rotation_angle += 20
             for angle in range(0, 360, 30):
                 bullet = arcade.SpriteCircle(7, arcade.color.MAGENTA)
@@ -105,6 +118,7 @@ class Boss(arcade.Sprite):
                 bullet_list.append(bullet)
     
     def spawn_minions(self, enemy_list):
+        """Создание миньонов вокруг босса"""
         from enemy import Enemy
         positions = []
         for _ in range(3):
@@ -125,6 +139,7 @@ class Boss(arcade.Sprite):
             enemy_list.append(minion)
     
     def take_damage(self, amount, game_view):
+        """Получение урона с эффектом мигания"""
         self.health -= amount
         self.color = arcade.color.WHITE
         if game_view.hit_sound:

@@ -2,9 +2,13 @@ import arcade
 from database import save_score, get_high_scores
 
 class MenuView(arcade.View):
+    """Главное меню с таблицей рекордов"""
     def on_draw(self):
+        """Отрисовка меню"""
         self.clear()
         arcade.set_background_color((10, 10, 20))
+        
+        # Заголовок и инструкции
         arcade.draw_text("DANGER MONSTERS", 512, 600, 
                          arcade.color.CYAN, 48, anchor_x="center")
         arcade.draw_text("ЛКМ или ENTER - начать", 512, 450, 
@@ -14,6 +18,7 @@ class MenuView(arcade.View):
         arcade.draw_text("Таблица результатов:", 512, 300, 
                          arcade.color.YELLOW, 22, anchor_x="center")
         
+        # Таблица рекордов
         scores = get_high_scores(5)
         y_pos = 250
         for i, (name, score, date) in enumerate(scores):
@@ -25,6 +30,7 @@ class MenuView(arcade.View):
                          arcade.color.LIGHT_GRAY, 20, anchor_x="center")
 
     def on_key_press(self, key, modifiers):
+        """Обработка клавиш в меню"""
         if key == arcade.key.ENTER:
             from game import GameView
             self.window.show_view(GameView())
@@ -32,10 +38,12 @@ class MenuView(arcade.View):
             self.window.close()
 
     def on_mouse_press(self, x, y, button, modifiers):
+        """Запуск игры по клику"""
         from game import GameView
         self.window.show_view(GameView())
 
 class GameOverView(arcade.View):
+    """Экран завершения игры (победа/поражение)"""
     def __init__(self, score, won):
         super().__init__()
         self.score = score
@@ -43,6 +51,7 @@ class GameOverView(arcade.View):
         save_score("Игрок", score)
     
     def on_draw(self):
+        """Отрисовка экрана завершения"""
         self.clear()
         arcade.set_background_color((15, 15, 25))
         
@@ -65,6 +74,7 @@ class GameOverView(arcade.View):
                          arcade.color.LIGHT_GRAY, 20, anchor_x="center")
     
     def on_key_press(self, key, modifiers):
+        """Обработка клавиш на экране завершения"""
         if key == arcade.key.ENTER:
             self.window.show_view(MenuView())
         elif key == arcade.key.Q:

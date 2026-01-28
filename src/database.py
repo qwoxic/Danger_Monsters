@@ -2,6 +2,7 @@ import sqlite3
 import datetime
 
 def init_database():
+    """Инициализация базы данных для хранения рекордов"""
     conn = sqlite3.connect('game_scores.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS scores
@@ -13,6 +14,7 @@ def init_database():
     conn.close()
 
 def save_score(player_name, score):
+    """Сохранение результата в базу данных"""
     init_database()
     conn = sqlite3.connect('game_scores.db')
     c = conn.cursor()
@@ -23,6 +25,7 @@ def save_score(player_name, score):
     conn.close()
 
 def get_high_scores(limit=10):
+    """Получение таблицы рекордов"""
     init_database()
     conn = sqlite3.connect('game_scores.db')
     c = conn.cursor()

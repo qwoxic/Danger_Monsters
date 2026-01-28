@@ -1,6 +1,7 @@
 import random
 
 class LevelManager:
+    """Управление уровнями и их параметрами"""
     def __init__(self):
         self.current_level = 0
         self.enemies_killed = 0
@@ -9,6 +10,7 @@ class LevelManager:
         self.spawn_delay = 1.5
         self.max_enemies = 8
         
+        # Конфигурация уровней
         self.level_configs = {
             1: {"enemies_to_kill": 5, "spawn_delay": 2.0, "enemy_speed": 60, "enemy_health": 30, "enemy_damage": 15},
             2: {"enemies_to_kill": 8, "spawn_delay": 1.8, "enemy_speed": 70, "enemy_health": 35, "enemy_damage": 18},
@@ -18,10 +20,12 @@ class LevelManager:
         }
     
     def update(self, delta_time, enemy_list):
+        """Обновление таймеров спавна"""
         self.spawn_timer += delta_time
         self._enemy_list = enemy_list
     
     def start_next_level(self, enemy_list):
+        """Запуск следующего уровня"""
         self.current_level += 1
         self._enemy_list = enemy_list
         
@@ -39,14 +43,17 @@ class LevelManager:
         return "normal"
     
     def enemy_killed(self):
+        """Учет убитых врагов"""
         self.enemies_killed += 1
     
     def is_level_complete(self):
+        """Проверка завершения уровня"""
         if self.current_level == 5:
             return False
         return self.enemies_killed >= self.enemies_to_kill
     
     def should_spawn_enemy(self):
+        """Определение необходимости спавна врага"""
         if self.current_level == 5:
             return False
         if len(self._enemy_list) >= self.max_enemies:
@@ -54,6 +61,7 @@ class LevelManager:
         return self.spawn_timer >= self.spawn_delay
     
     def get_spawn_count(self):
+        """Количество врагов для спавна"""
         self.spawn_timer = 0
         if self.current_level == 1:
             return 1
@@ -63,16 +71,19 @@ class LevelManager:
             return random.randint(1, 2)
     
     def get_enemy_speed(self):
+        """Получение скорости врага для текущего уровня"""
         if self.current_level in self.level_configs:
             return self.level_configs[self.current_level]["enemy_speed"]
         return 60
     
     def get_enemy_health(self):
+        """Получение здоровья врага для текущего уровня"""
         if self.current_level in self.level_configs:
             return self.level_configs[self.current_level]["enemy_health"]
         return 30
     
     def get_enemy_damage(self):
+        """Получение урона врага для текущего уровня"""
         if self.current_level in self.level_configs:
             return self.level_configs[self.current_level]["enemy_damage"]
         return 15
